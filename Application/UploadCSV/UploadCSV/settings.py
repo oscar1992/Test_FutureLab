@@ -12,21 +12,26 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 import os
+from dotenv import load_dotenv # Importing the load_dotenv function to load environment variables from a .env file
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) #Added to get the correct path for the .env file
+load_dotenv()
+
+# print("ENVFILE: ", os.path.join(BASE_DIR, '.env'))
+# print("SECTRET_KEY: ", os.getenv("DJANGO_SECRET_KEY"))
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-781-f1$satopdt55$yq(4!g!$6)@whdb=103h6#_0@ui^d7=-g'
+SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = bool(os.getenv("DEBUG", default=0))
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = os.getenv("DJANGO_ALLOWED_HOSTS","localhost").split(",")
 
 AUTH_USER_MODEL = 'UploadImages.User'
 
@@ -40,7 +45,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'UploadImages',
-    'allauth',
+    'allauth',      # Django allauth for authentication with Google Oauth2
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
@@ -54,9 +59,10 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'allauth.account.middleware.AccountMiddleware',
+    'allauth.account.middleware.AccountMiddleware', # Middleware added for allauth
 ]
 
+# Middleware to handle google authentication
 AUTHENTICATION_BACKENDS = [
     # Needed to login by username in Django admin, regardless of `allauth`
     'django.contrib.auth.backends.ModelBackend',
@@ -65,6 +71,7 @@ AUTHENTICATION_BACKENDS = [
     'allauth.account.auth_backends.AuthenticationBackend',
 ]
 
+# Social authentication settings for Google
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
         'SCOPE': [
@@ -78,7 +85,7 @@ SOCIALACCOUNT_PROVIDERS = {
     }
 }
 
-# Django allauth config
+# Django allauth config for email verification and login methods
 SITE_ID = 1
 ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
 ACCOUNT_SIGNUP_FIELDS = ['email*', 'username*', 'password1*', 'password2*']
@@ -113,7 +120,7 @@ WSGI_APPLICATION = 'UploadCSV.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'NAME': os.path.join(BASE_DIR,'db.sqlite3'),
     }
 }
 
@@ -158,5 +165,5 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'UploadImages/Uploads')
-MEDIA_URL = '/Uploads/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'UploadImages/Uploads') # Directory where uploaded files will be stored
+MEDIA_URL = '/Uploads/' # URL to access the uploaded files
