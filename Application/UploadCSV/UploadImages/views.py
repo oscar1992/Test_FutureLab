@@ -1,17 +1,22 @@
 from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
 from .models import User, File, UploadedImage
 from datetime import datetime
 from django.core.files.storage import default_storage
 import csv
 
 # Create your views here.
+@login_required
 def show_upload_form(request):
-    return render(request, 'Upload/upload_form.html')
+    user = request.user
+    context = {'user': user}
+    return render(request, 'Upload/upload_form.html', context)
 
+@login_required
 def uploadCSV(request):
     if request.method == 'POST':
         current_dateTime = datetime.now()
-        user = User.objects.get(username=request.POST['username'])
+        user = User.objects.get(id=request.POST['username'])
         fecha = str(current_dateTime.year) + str(current_dateTime.month) + str(current_dateTime.day)
         uploaded_file = request.FILES['file']
         filename = user.username+fecha+uploaded_file.name
@@ -34,11 +39,10 @@ def uploadCSV(request):
             Archivo.status = 'failed'
             Archivo.save()
             return render(request, 'Upload/upload_fileError.html')
-        
+        return render(request, 'Upload/upload_success.html', {'file_name': uploaded_file.name, 'lista': imagesProcesed})
+    return render(request, 'Upload/upload_form.html')
 
-        
-    return render(request, 'Upload/upload_success.html', {'file_name': uploaded_file.name, 'lista': imagesProcesed})
-
+@login_required
 def processListofImages(request, fileName, Archivo):
     files = list()
     try:

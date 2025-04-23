@@ -1,7 +1,9 @@
 <form action="{% url 'upload_csv' %}" method="post" enctype="multipart/form-data">
     {% csrf_token %}
+    <label>Welcome: {{user.username}}</label>
     <label for="file">Select file:</label>
-    <input type="hidden" name="username" value="testuser">
+    <input type="hidden" name="username" value="{{user.id}}" />  
     <input type="file" name="file" id="file" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" required>
     <button type="submit">Upload</button>
 </form>
+<a href="/accounts/logout/">Logout</a>

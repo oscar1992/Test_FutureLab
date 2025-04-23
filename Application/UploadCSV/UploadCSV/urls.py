@@ -20,5 +20,5 @@ from django.urls import path, include
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('upload/', include('UploadImages.urls')),  # Include the URLs from the UploadImages app
-    #path('accounts/', include('allauth.urls')),
+    path('accounts/', include('allauth.urls')),
 ]
